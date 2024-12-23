@@ -2,8 +2,9 @@ import { createUserWithEmailAndPassword, GoogleAuthProvider, onAuthStateChanged,
 import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 import auth from "../firebase/firebase.config";
 import PropTypes from "prop-types";
+import axios from "axios";
 
-interface AuthContextType {
+export interface AuthContextType {
     user: User | null;
     setUser: Dispatch<SetStateAction<User | null>>;
     loading: boolean;
@@ -14,9 +15,9 @@ interface AuthContextType {
     logout: () => Promise<void>;
 }
 
-const Authcontext = createContext<AuthContextType | null>(null);
+export const Authcontext = createContext<AuthContextType | null>(null);
 const googleProvider = new GoogleAuthProvider();
-const AuthProvider = ({ children }: {children: ReactNode}) => {
+const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const createUserWithEmailAndPass = (email: string, password: string) => {
@@ -48,8 +49,23 @@ const AuthProvider = ({ children }: {children: ReactNode}) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
+            console.log(currentUser);
             setUser(currentUser);
-            setLoading(false);
+            if (currentUser) {
+                console.log(import.meta.env.VITE_BASE_URL);
+                axios.post(`${import.meta.env.VITE_BASE_URL}/authentication`, {
+                    email: currentUser.email,
+                })
+                    .then(data => {
+                        if (data?.data) {
+                            localStorage.setItem(`access_token`, data.data?.data?.token);
+                            setLoading(false);
+                        }
+                    })
+            }else{
+                localStorage.removeItem(`access_token`);
+                setLoading(false);
+            }
         })
         return () => {
             unsubscribe();

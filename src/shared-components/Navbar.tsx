@@ -1,7 +1,11 @@
 import { Link, NavLink } from "react-router";
+import useAuth from "../hook/useAuth";
+import Dropdown from "./Dropdown";
+import { AuthContextType } from "../provider/AuthProvider";
 
 
 const Navbar = () => {
+    const { user } = useAuth() as AuthContextType;
     return (
         <div className="navbar bg-base-100">
             <div className="navbar-start">
@@ -40,7 +44,9 @@ const Navbar = () => {
                 </ul>
             </div>
             <div className="navbar-end">
-                <Link to={`/register`} ><button className="btn btn-outline btn-accent">Sign Up</button></Link>
+                {
+                    user ? <Dropdown /> : <Link to={`/register`} ><button className="btn btn-outline btn-primary">Sign Up</button></Link>
+                }
             </div>
         </div>
     );
