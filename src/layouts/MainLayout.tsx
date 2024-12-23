@@ -7,7 +7,7 @@ const MainLayout = () => {
     return (
         <>
             <Navbar />
-            <section className="min-h-[500px]">
+            <section className="min-h-screen">
                 <Outlet />
             </section>
             <Footer />
